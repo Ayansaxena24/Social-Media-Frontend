@@ -23,10 +23,11 @@ const GET_POSTS = gql`
 `;
 
 const LIKE_POST = gql`
-  mutation LikePost($postId: ID!) {
-    likePost(postId: $postId) {
+  mutation LikePost($postId: ID!, $userId: ID!) {
+    likePost(postId: $postId, userId: $userId) {
       id
       likes
+      likedby
     }
   }
 `;
@@ -59,7 +60,9 @@ const NewsFeed: React.FC = () => {
 
   const handleLike = async (postId: string) => {
     try {
-      await likePost({ variables: { postId } });
+      let dp = userData?.users.filter((item: any) => item.email === user?.email);
+      console.log(userData.users, "dp");
+      await likePost({ variables: { postId, userId : dp[0]?.id } });
       refetch(); // Refetch posts to update the like count
     } catch (error) {
       console.error("Error liking post:", error);
@@ -129,7 +132,7 @@ const NewsFeed: React.FC = () => {
   console.log(displayedPosts, "qwerty");
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl bg-gradient-to-tl from-gray-700 via-gray-900 to-black w-[100%]">
+    <div className="px-4 py-8 bg-gradient-to-tl from-gray-700 via-gray-900 to-black w-[100%]">
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

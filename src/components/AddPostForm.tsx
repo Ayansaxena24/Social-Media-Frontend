@@ -6,14 +6,16 @@ import { useUser } from '../context/UserContext';
 
 // Existing AddPost mutation
 const ADD_POST = gql`
-  mutation AddPost($content: String!, $author: String!, $mentions: [String!], $image: String!, $profilePicture: String!) {
-    addPost(content: $content, author: $author, mentions: $mentions, image: $image, profilePicture: $profilePicture) {
+  mutation AddPost($content: String!, $author: String!, $mentions: [String!], $image: String!, $profilePicture: String!, $likes: Int!, $likedby: [ID!]) {
+    addPost(content: $content, author: $author, mentions: $mentions, image: $image, profilePicture: $profilePicture, likes: $likes, likedby: $likedby) {
       id
       content
       author
       mentions
       image
       profilePicture
+      likes
+      likedby
     }
   }
 `;
@@ -81,7 +83,9 @@ const AddPostForm: React.FC = () => {
           author: user?.displayName ?? "", 
           mentions: mentions.map(mention => mention.displayname) ,
           image: imageUrl,
-          profilePicture: profPic
+          profilePicture: profPic,
+          likes: 0,
+          likedby: []
         } 
       });
       setContent("");
