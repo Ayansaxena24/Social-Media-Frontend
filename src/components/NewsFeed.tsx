@@ -12,12 +12,14 @@ const GET_POSTS = gql`
   query GetPosts {
     posts {
       id
+      authorid
       content
       author
       mentions
       image
       profilePicture
       likes
+      likedby
     }
   }
 `;
@@ -40,6 +42,17 @@ const GET_USERS = gql`
       email
       username
       profilePicture
+      following
+      followers
+    }
+  }
+`;
+
+const FOLLOW_USER = gql`
+  mutation FollowUser($followerId: ID!, $followeeId: ID!) {
+    followUser(followerId: $followerId, followeeId: $followeeId) {
+      id
+      following
     }
   }
 `;
@@ -48,6 +61,7 @@ const NewsFeed: React.FC = () => {
   const { user } = useUser();
   const { loading, error, data, refetch } = useQuery(GET_POSTS);
   const [likePost] = useMutation(LIKE_POST);
+  const [followUser] = useMutation(FOLLOW_USER);
   const [posts, setPosts] = useState([]);
   const {
     data: userData,
@@ -55,6 +69,8 @@ const NewsFeed: React.FC = () => {
     error: userError,
   } = useQuery(GET_USERS);
   const [displayedPosts, setDisplayedPosts] = useState([]);
+  const [availablePosts, setAvailablePosts] = useState([]);
+  const [displayUsers, setDisplayUsers] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const POSTS_PER_LOAD = 10; // Number of posts to load initially and per scroll
 
@@ -66,6 +82,44 @@ const NewsFeed: React.FC = () => {
       refetch(); // Refetch posts to update the like count
     } catch (error) {
       console.error("Error liking post:", error);
+    }
+  };
+
+  console.log(data, "data");
+  
+  useEffect(() => {
+    const presentUserId = userData?.users.find((item : any) => item.email === user?.email)?.id;
+    console.log(presentUserId, "presentUserId");
+    const visiblePosts = data?.posts.filter((item: any) => userData?.users.find((user: any) => item.authorid === presentUserId || user.id === presentUserId)?.following.includes(item.authorid));
+    console.log(userData?.users, "visiblePosts");
+    setAvailablePosts(visiblePosts);
+
+    const visibleUsers = userData?.users.filter((item: any) => item.id !== presentUserId);
+    setDisplayUsers(visibleUsers);
+    refetch();
+  }, [userData, data, user]);
+
+  const handleFollow = async (followeeId: string) => {
+    try {
+      const follower = userData?.users.filter((item: any) => item.email === user?.email);
+      const followerId = follower[0]?.id;
+      console.log(followerId, "followerId");
+      
+      if (!followerId) {
+        console.error("Current user not found");
+        return;
+      }
+  
+      await followUser({ 
+        variables: { 
+          followerId, 
+          followeeId 
+        } 
+      });
+      
+      refetch(); // Refetch users to update the follow status
+    } catch (error) {
+      console.error("Error following user:", error);
     }
   };
 
@@ -126,13 +180,17 @@ const NewsFeed: React.FC = () => {
     );
 
   const isFriend = (userId: string) => {
-    return user.following.some((friend) => friend.id === userId);
+    const presentUserId = userData?.users.find((item : any) => item.email === user.email)?.id;
+    console.log(presentUserId, "presentUserId");
+    return userData?.users.find((item : any) => item.id === presentUserId)?.following.includes(userId);
   };
+
+  console.log(isFriend("2"), "testtesttest")
 
   console.log(displayedPosts, "qwerty");
 
   return (
-    <div className="px-4 py-8 bg-gradient-to-tl from-gray-700 via-gray-900 to-black w-[100%]">
+    <div className="px-4 py-8 w-[100%]">
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -153,12 +211,20 @@ const NewsFeed: React.FC = () => {
         </div>
 
         {/* Center Section - Posts */}
-        <div className="flex-2 w-[100%]">
+        <div className="flex-1.2 w-[100%] ">
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white shadow-md rounded-lg p-6"
+            className="bg-white shadow-md rounded-lg p-6 w-[100%]"
           >
+            <div className="flex w-[100%] bg-red-300">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <AddPostForm />
+          </motion.div>
+        </div>
             <h2 className="text-2xl font-semibold mb-4 text-gray-700">Posts</h2>
             <InfiniteScroll
               dataLength={displayedPosts.length}
@@ -174,7 +240,7 @@ const NewsFeed: React.FC = () => {
               }
             >
               <AnimatePresence>
-                {displayedPosts.map(
+                {availablePosts.map(
                   (post: {
                     id: string;
                     content: string;
@@ -183,6 +249,7 @@ const NewsFeed: React.FC = () => {
                     image: string;
                     profilePicture: string;
                     likes: number;
+                    likedby: string[];
                   }) => (
                     <motion.div
                       key={post.id}
@@ -196,7 +263,7 @@ const NewsFeed: React.FC = () => {
                         <div className="flex w-[100%] justify-between">
                           <div className="flex gap-x-4">
                             <img
-                              src={post.profilePicture}
+                              src={post.profilePicture ? post.profilePicture : `https://cdn-icons-png.flaticon.com/512/149/149071.png`}
                               alt="Profile"
                               className="w-8 h-8 rounded-full"
                             />
@@ -223,7 +290,7 @@ const NewsFeed: React.FC = () => {
                             onClick={() => handleLike(post.id)}
                             className="like-button bg-blue-500 text-white px-3 py-1 rounded"
                           >
-                            👍 Like ({post.likes ? post.likes : 0})
+                            {post?.likedby.includes(userData?.users.find((item : any) => item.email === user?.email)?.id) ? `👎 Dislike (${post.likes ? post.likes : 0})`:`👍 Like (${post.likes ? post.likes : 0})`}
                           </button>
                         </div>
                       </div>
@@ -242,9 +309,9 @@ const NewsFeed: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             className="bg-white shadow-md rounded-lg p-6"
           >
-            <h2 className="text-2xl font-semibold mb-4 text-gray-700">Users</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-700">Who to Follow</h2>
             <AnimatePresence>
-              {userData?.users?.map(
+              {displayUsers.map(
                 (userProfile: {
                   id: string;
                   username: string;
@@ -267,6 +334,7 @@ const NewsFeed: React.FC = () => {
                           ? "bg-red-500 text-white hover:bg-red-600"
                           : "bg-blue-500 text-white hover:bg-blue-600"
                       }`}
+                      onClick={() => handleFollow(userProfile.id)}
                     >
                       {isFriend(userProfile.id) ? "Unfollow" : "Follow"}
                     </button>

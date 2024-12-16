@@ -6,11 +6,12 @@ import { useUser } from '../context/UserContext';
 
 // Existing AddPost mutation
 const ADD_POST = gql`
-  mutation AddPost($content: String!, $author: String!, $mentions: [String!], $image: String!, $profilePicture: String!, $likes: Int!, $likedby: [ID!]) {
-    addPost(content: $content, author: $author, mentions: $mentions, image: $image, profilePicture: $profilePicture, likes: $likes, likedby: $likedby) {
+  mutation AddPost($content: String!, $author: String!, $mentions: [String!], $image: String!, $profilePicture: String!, $likes: Int!, $likedby: [ID!], $authorid: ID!) {  
+    addPost(content: $content, author: $author, mentions: $mentions, image: $image, profilePicture: $profilePicture, likes: $likes, likedby: $likedby, authorid: $authorid) {
       id
       content
       author
+      authorid
       mentions
       image
       profilePicture
@@ -28,6 +29,8 @@ const GET_USERS = gql`
       email
       username
       profilePicture
+      following
+      followers
     }
   }
 `;
@@ -37,6 +40,7 @@ const AddPostForm: React.FC = () => {
   const [mentions, setMentions] = useState<{id: string, displayname: string}[]>([]);
   const [addPost] = useMutation(ADD_POST);
   const [image, setImage] = useState(null);
+  const [authorID, setAuthorID] = useState("");
   const [profPic, setProfPic] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [availableUsers, setAvailableUsers] = useState<{id: string, displayname: string}[]>([]);
@@ -65,7 +69,8 @@ const AddPostForm: React.FC = () => {
       let dp = usersData?.users.filter((item: any) => item.email === user?.email);
       if (dp) {
         setProfPic(dp[0]?.profilePicture);
-        console.log(dp[0]?.profilePicture, "dp");
+        setAuthorID(dp[0]?.id);
+        console.log(dp[0]?.id, "dp");
       }
     }
     handleDp();
@@ -85,7 +90,8 @@ const AddPostForm: React.FC = () => {
           image: imageUrl,
           profilePicture: profPic,
           likes: 0,
-          likedby: []
+          likedby: [],
+          authorid: authorID
         } 
       });
       setContent("");
@@ -115,13 +121,14 @@ const AddPostForm: React.FC = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6 w-[300px]"
+      className="mx-auto bg-white shadow-md rounded-lg p-6 w-[100%"
     >
       <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Create a Post</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className='flex gap-x-4 items-center'>
         { profPic && <img src={`data:${profPic}`} style={{ width: "60px", height: "60px", borderRadius: "50%" }} />}
+        { !profPic && <img src={`https://cdn-icons-png.flaticon.com/512/149/149071.png`} style={{ width: "60px", height: "60px", borderRadius: "50%" }} />}
         </div>
 
         <div>
