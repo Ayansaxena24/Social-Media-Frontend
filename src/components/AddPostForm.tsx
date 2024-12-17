@@ -83,8 +83,7 @@ const AddPostForm: React.FC = () => {
       }
     }
     handleDp();
-  }, [usersData, user]);
-  
+  }, [usersData, user]);  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,9 +117,13 @@ const AddPostForm: React.FC = () => {
   // Exclude current user and already mentioned users from the list
   useEffect(() => {
 
+    const presentUserId = usersData?.users.find(
+      (item: any) => item.email === user?.email
+    )?.id;
+
     const availUsers = usersData?.users.filter(
       (u: {id: string, username: string}) => 
-      u.id !== user?.id && 
+      u.id !== presentUserId && 
     !mentions.some(mention => mention.id === u.id)
   ) || [];
   setAvailableUsers(availUsers.map((u: {id: string, username: string}) => ({ id: u.id, displayname: u.username })));

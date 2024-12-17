@@ -5,7 +5,7 @@ import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Eye, EyeOff, User, Lock, Mail, Camera } from "lucide-react";
+import { Eye, EyeOff, Camera } from "lucide-react";
 import { TextField } from "@mui/material";
 
 // GraphQL Mutation for user sign up
@@ -68,10 +68,11 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length <= 1) {
+    if (user && userData?.users?.length < 4) {
+      console.log(userData?.users?.length, "userData?.users?.length");
       navigate("/"); // Redirect to home if user is already logged in
     }
-  }, [user, navigate]);
+  }, [user]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,6 +173,7 @@ const Signup: React.FC = () => {
             <a
               href="/login"
               className="font-medium text-blue-600 hover:text-blue-500"
+              data-testid = "signInButton"
             >
               Sign in
             </a>
@@ -185,6 +187,7 @@ const Signup: React.FC = () => {
               <TextField
                 id="displayName"
                 type="text"
+                data-testid = "displayName"
                 label="Display Name"
                 required
                 value={displayName}
@@ -201,6 +204,7 @@ const Signup: React.FC = () => {
                 id="email"
                 label="Email Address"
                 type="email"
+                data-testid = "email123"
                 autoComplete="email"
                 required
                 value={email}
@@ -218,6 +222,7 @@ const Signup: React.FC = () => {
                 type="bio"
                 autoComplete="bio"
                 required
+                data-testid="bio"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 disabled={isLoading}
@@ -234,6 +239,7 @@ const Signup: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 required
+                data-testid="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -264,6 +270,7 @@ const Signup: React.FC = () => {
             />
             <p className="opacity-0">jg</p>
             <div
+            data-testid="imageButton"
               onClick={handleCameraIconClick}
               className="cursor-pointer hover:opacity-70 transition-opacity"
             >
@@ -296,6 +303,7 @@ const Signup: React.FC = () => {
               type="submit"
               disabled={isLoading}
               whileHover={{ scale: isLoading ? 1 : 1.05 }}
+              data-testid="submitButton"
               whileTap={{ scale: isLoading ? 1 : 0.95 }}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 isLoading

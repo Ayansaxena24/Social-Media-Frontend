@@ -97,6 +97,8 @@ const NewsFeed: React.FC = () => {
   //   }
   // };
 
+
+  //func to like/dislike the posts
   const handleLike = async (postId: string) => {
     try {
       let dp = userData?.users.filter(
@@ -117,6 +119,7 @@ const NewsFeed: React.FC = () => {
   //   setDisplayedPosts(visibleslice(0, POSTS_PER_LOAD * pageNumber) || []);
   // }, [data])
 
+  // updating user info as soon as data changes
   useEffect(() => {
     console.log(data, "data");
     handleDp();
@@ -175,6 +178,7 @@ const NewsFeed: React.FC = () => {
   //       refetch();
   // }, [userData, data, user]);
 
+  //set active posts (the posts which will be visible to individual users since posts are only visible if the user is following other users).
   useEffect(() => {
     const presentUserId = userData?.users.find(
       (item: any) => item.email === user?.email
@@ -205,13 +209,13 @@ const NewsFeed: React.FC = () => {
   }, [userData, data, user, displayedPosts.length]);
 
 
+  //func to follow a user
   const handleFollow = async (followeeId: string) => {
     try {
       const follower = userData?.users.filter(
         (item: any) => item.email === user?.email
       );
       const followerId = follower[0]?.id;
-      // console.log(followerId, "followerId");
 
       if (!followerId) {
         // console.error("Current user not found");
@@ -227,17 +231,17 @@ const NewsFeed: React.FC = () => {
 
       refetch(); // Refetch users to update the follow status
     } catch (error) {
-      // console.error("Error following user:", error);
+      alert(error)
     }
   };
 
+  //set all the data after fetching from UserData to display on the UserDetails section
   const handleDp = () => {
     let dp = userData?.users.filter(
       (item: any) => item.email === user?.email
     );
     if (dp) {
       setProfPic(dp[0]?.profilePicture);
-      // console.log(dp, "dp");
     }
     if (dp) {
       setUserName(dp[0]?.username);
@@ -250,9 +254,10 @@ const NewsFeed: React.FC = () => {
     }
   };
 
+  //navigate to the login screen if you are a new user
   useEffect(() => {
     handleDp();
-    if (userData?.users?.length < 1) navigate('/login')
+    if (userData?.users?.length < 2) navigate('/login')
   }, [userData, user]);
 
   useEffect(() => {
@@ -287,6 +292,8 @@ const NewsFeed: React.FC = () => {
   //   setHasMore(currentLength + POSTS_PER_LOAD < posts.length);
   // };
 
+
+  //func to load more posts, if the user scrolls dopwn
   const loadMorePosts = () => {
     // Calculate the current number of displayed posts
     const currentLength = displayedPosts.length;
@@ -330,6 +337,7 @@ const NewsFeed: React.FC = () => {
       </motion.p>
     );
 
+    // func to find whether a user is friend of another user or not
   const isFriend = (userId: string) => {
     const presentUserId = userData?.users.find(
       (item: any) => item.email === user.email
@@ -339,11 +347,6 @@ const NewsFeed: React.FC = () => {
       .find((item: any) => item.id === presentUserId)
       ?.following.includes(userId);
   };
-
-
-  // console.log(isFriend("2"), "testtesttest");
-
-  // console.log(displayedPosts, "qwerty");
 
    const followUserComponent = () => {
     return (
@@ -357,7 +360,7 @@ const NewsFeed: React.FC = () => {
               Who to Follow
             </h2>
             <AnimatePresence>
-              {displayUsers.map(
+              {displayUsers?.map(
                 (userProfile: {
                   id: string;
                   username: string;
@@ -405,13 +408,6 @@ const NewsFeed: React.FC = () => {
       backgroundRepeat: "no-repeat",
     }}
     >
-      {/* <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold text-center mb-8 text-gray-800"
-      >
-        News Feed
-      </motion.h1> */}
 
       <div className="flex flex-col md:flex-row gap-8 w-[100%] min-h-screen bg-gray-100 relative">
         {/* Left Section - Profile Box */}
@@ -473,7 +469,7 @@ const NewsFeed: React.FC = () => {
         </div>
 
         {/* Center Section - Posts */}
-        <div className="flex-1.2 sm:w-[50%]">
+        <div className="flex-1.2 w-full lg:w-[50%]">
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 // import { Eye, EyeOff } from "lucide-react";
 
 const Login: React.FC = () => {
@@ -52,6 +53,7 @@ const Login: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <a 
+            data-testid="createAccountButton"
               href="/signup" 
               className="font-medium text-blue-600 hover:text-blue-500"
             >
@@ -73,6 +75,7 @@ const Login: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
+                data-testid='email123'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -88,6 +91,7 @@ const Login: React.FC = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
+                data-testid='password123'
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -100,13 +104,14 @@ const Login: React.FC = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                 disabled={isLoading}
+                data-testid="eye"
               >
                 {showPassword ? (
-                  // <EyeOff className="h-5 w-5" />
-                  <p>EyeOff</p>
+                  <EyeOff className="h-5 w-5" />
+                  // <p>EyeOff</p>
                 ) : (
-                  // <Eye className="h-5 w-5" />
-                  <p>EyeOn</p>
+                  <Eye className="h-5 w-5" />
+                  // <p>EyeOn</p>
                 )}
               </button>
             </div>
@@ -116,6 +121,7 @@ const Login: React.FC = () => {
             <div className="flex items-center">
               <input
                 id="remember-me"
+                data-testid="checkbox"
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
@@ -131,6 +137,7 @@ const Login: React.FC = () => {
               <a 
                 href="/forgot-password" 
                 className="font-medium text-blue-600 hover:text-blue-500"
+                data-testid="forgotpassword"
               >
                 Forgot your password?
               </a>

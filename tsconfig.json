@@ -1,7 +1,10 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "module": "commonjs",  // Ensure compatibility with Jest
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*", "jest.config.ts"],
+  "types": ["jest"]  // Add Jest types to ensure that Jest globals like describe, test, expect are recognized
 }
