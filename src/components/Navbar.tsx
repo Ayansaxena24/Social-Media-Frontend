@@ -77,14 +77,14 @@ const Navbar: React.FC = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  if (location.pathname === '/signup') {
+  if (location.pathname === '/signup' || location.pathname === '/login') {
     return (
       <nav 
         className="bg-white/50 backdrop-blur-xl"
         style={{ 
           padding: "10px", 
           color: "black",
-          backgroundImage: `url('https://i.pinimg.com/1200x/42/43/e1/4243e170920d95f50c92ad35531e3248.jpg')`,
+          backgroundImage: `url(${location.pathname === '/signup' ? 'https://i.pinimg.com/1200x/42/43/e1/4243e170920d95f50c92ad35531e3248.jpg' : 'https://i.pinimg.com/736x/a6/60/6c/a6606cb24d4d631234a2c31f63012643.jpg'})`,
           backgroundSize: "cover",
           backgroundPosition: "top",
           backgroundRepeat: "no-repeat",

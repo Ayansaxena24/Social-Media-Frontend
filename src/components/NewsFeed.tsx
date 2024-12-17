@@ -6,8 +6,8 @@ import { useUser } from "../context/UserContext";
 import AddPostForm from "./AddPostForm";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { ThumbsUp } from "lucide-react";
-import { set } from "firebase/database";
+import { ThumbsUp, UserPlus, UserMinus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // GraphQL Queries
 const GET_POSTS = gql`
@@ -82,6 +82,7 @@ const NewsFeed: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const POSTS_PER_LOAD = 10; // Number of posts to load initially and per scroll
   const [pageNumber, setPageNumber] = useState(1);
+  const navigate = useNavigate();
 
   // const handleLike = async (postId: string) => {
   //   try {
@@ -251,6 +252,7 @@ const NewsFeed: React.FC = () => {
 
   useEffect(() => {
     handleDp();
+    if (userData?.users?.length < 1) navigate('/login')
   }, [userData, user]);
 
   useEffect(() => {
@@ -338,16 +340,66 @@ const NewsFeed: React.FC = () => {
       ?.following.includes(userId);
   };
 
+
   // console.log(isFriend("2"), "testtesttest");
 
   // console.log(displayedPosts, "qwerty");
 
+   const followUserComponent = () => {
+    return (
+    <div className="flex-1 md:w-[30%]">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white shadow-md rounded-lg p-6"
+          >
+            <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+              Who to Follow
+            </h2>
+            <AnimatePresence>
+              {displayUsers.map(
+                (userProfile: {
+                  id: string;
+                  username: string;
+                  email: string;
+                }) => (
+                  <motion.div
+                    key={userProfile.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    layout
+                    className="flex justify-between items-center py-2 border-b last:border-b-0"
+                  >
+                    <p className="text-gray-800">
+                      {userProfile.username || <Skeleton />}
+                    </p>
+                    <button
+                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        isFriend(userProfile.id)
+                          ? "bg-red-500 text-white hover:bg-red-600"
+                          : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                      onClick={() => handleFollow(userProfile.id)}
+                    >
+                      {isFriend(userProfile.id) ?  <UserMinus size={20} />
+ : <UserPlus size={20} />}
+                    </button>
+                  </motion.div>
+                )
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+    )
+   }
+
   return (
-    <div className="px-4 py-8 w-[100%]"
+    <div className="px-4 py-8 w-[100%] bg-gray-200"
     style={{ 
       padding: "10px", 
       color: "black",
-      backgroundImage: `url('https://i.pinimg.com/736x/9b/a7/a6/9ba7a6f8ff3d337564ee1fe7d97c74b1.jpg')`,
+      backgroundImage: `url('')`,
       backgroundSize: "cover",
       backgroundPosition: "top",
       backgroundRepeat: "no-repeat",
@@ -363,7 +415,7 @@ const NewsFeed: React.FC = () => {
 
       <div className="flex flex-col md:flex-row gap-8 w-[100%] min-h-screen bg-gray-100 relative">
         {/* Left Section - Profile Box */}
-        <div className="w-[20%] md:sticky md:top-4 md:h-[95vh]">
+        <div className="lg:w-[20%] md:sticky md:top-4 md:h-[95vh]">
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -396,28 +448,32 @@ const NewsFeed: React.FC = () => {
                 {userName}
               </p>
               <p className="text-center font-mono mt-2 text-md">{bio}</p>
-              <div className="flex items-center mt-4 space-x-4">
+              <div className="flex items-center mt-4 space-x-4 sm:flex-row flex-col">
                 <div className="flex flex-col items-center flex-1">
                   <p className="font-semibold text-xl">{numberOfPosts}</p>
                   <p className="text-gray-600">Posts</p>
                 </div>
-                <div className="h-8 border-r border-gray-300"></div>
-                <div className="flex flex-col items-center flex-1">
-                  <p className="font-semibold text-xl">{numberOfFollowers}</p>
-                  <p className="text-gray-600">Followers</p>
+                <div className="h-8 border-r border-gray-300 hidden lg:flex"></div>
+                <div className="flex flex-col items-center flex-1 lg:mr-0">
+                  <p className="font-semibold text-xl text-center mr-4 lg:mr-0">{numberOfFollowers}</p>
+                  <p className="text-gray-600 text-center mr-4 lg:mr-0">Followers</p>
                 </div>
-                <div className="h-8 border-r border-gray-300"></div>
+                <div className="h-8 border-r border-gray-300 hidden lg:flex"></div>
                 <div className="flex flex-col items-center flex-1">
-                  <p className="font-semibold text-xl">{numberOfFollowing}</p>
-                  <p className="text-gray-600">Following</p>
+                  <p className="font-semibold text-xl mr-4 lg:mr-0">{numberOfFollowing}</p>
+                  <p className="text-gray-600 mr-4 lg:mr-0">Following</p>
                 </div>
               </div>
             </div>
           </motion.div>
         </div>
 
+        <div className="md:hidden w-full">
+        {followUserComponent()}
+        </div>
+
         {/* Center Section - Posts */}
-        <div className="flex-1.2 w-[50%]">
+        <div className="flex-1.2 sm:w-[50%]">
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -533,48 +589,8 @@ const NewsFeed: React.FC = () => {
         </div>
 
         {/* Right Section - Users List */}
-        <div className="flex-1 w-[30%]">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-white shadow-md rounded-lg p-6"
-          >
-            <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-              Who to Follow
-            </h2>
-            <AnimatePresence>
-              {displayUsers.map(
-                (userProfile: {
-                  id: string;
-                  username: string;
-                  email: string;
-                }) => (
-                  <motion.div
-                    key={userProfile.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    layout
-                    className="flex justify-between items-center py-2 border-b last:border-b-0"
-                  >
-                    <p className="text-gray-800">
-                      {userProfile.username || <Skeleton />}
-                    </p>
-                    <button
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                        isFriend(userProfile.id)
-                          ? "bg-red-500 text-white hover:bg-red-600"
-                          : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                      onClick={() => handleFollow(userProfile.id)}
-                    >
-                      {isFriend(userProfile.id) ? "Unfollow" : "Follow"}
-                    </button>
-                  </motion.div>
-                )
-              )}
-            </AnimatePresence>
-          </motion.div>
+        <div className="hidden md:flex md:w-1/4 w-[100%]">
+        {followUserComponent()}
         </div>
       </div>
     </div>

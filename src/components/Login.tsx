@@ -31,12 +31,19 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+    style={{
+      backgroundImage: `url('https://i.pinimg.com/736x/a6/60/6c/a6606cb24d4d631234a2c31f63012643.jpg')`,
+      backgroundSize: "cover",
+      backgroundPosition: "top",
+      backgroundRepeat: "no-repeat",
+    }}
+    >
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full max-w-md space-y-8 bg-white shadow-md rounded-xl p-8"
+        className="w-full max-w-md space-y-8 bg-white/30 backdrop-blur-xl shadow-md rounded-xl p-8"
       >
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

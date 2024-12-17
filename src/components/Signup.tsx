@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Eye, EyeOff, User, Lock, Mail, Camera } from "lucide-react";
 import { TextField } from "@mui/material";
 
@@ -31,8 +31,25 @@ const SIGN_UP_USER = gql`
   }
 `;
 
+const GET_USERS = gql`
+  query GetUsers {
+    users {
+      id
+      email
+      username
+      profilePicture
+      bio
+    }
+  }
+`;
+
 const Signup: React.FC = () => {
   const { user } = useUser();
+  const {
+    data: userData,
+    loading: userLoading,
+    error: userError,
+  } = useQuery(GET_USERS);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -51,7 +68,7 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && userData?.users?.length <= 1) {
       navigate("/"); // Redirect to home if user is already logged in
     }
   }, [user, navigate]);
