@@ -42,9 +42,6 @@ This is a social media app built using **React**, **TypeScript**, **GraphQL**, a
 - **GraphQL**: A query language for fetching data, used to get posts and user information efficiently.
 - **Apollo Client**: Used for managing data fetching from the GraphQL server.
 
-### Backend:
-- **Supabase** (or a custom GraphQL endpoint): Backend-as-a-service to provide the GraphQL API for the app.
-
 ---
 
 ## Getting Started
