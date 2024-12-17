@@ -3,6 +3,9 @@ import { useMutation, useQuery, gql } from "@apollo/client";
 import { motion } from "framer-motion";
 import { Chip, Autocomplete, TextField } from '@mui/material';
 import { useUser } from '../context/UserContext';
+import { Camera } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Existing AddPost mutation
 const ADD_POST = gql`
@@ -31,6 +34,7 @@ const GET_USERS = gql`
       profilePicture
       following
       followers
+      bio
     }
   }
 `;
@@ -46,6 +50,11 @@ const AddPostForm: React.FC = () => {
   const [availableUsers, setAvailableUsers] = useState<{id: string, displayname: string}[]>([]);
   const { user } = useUser();
   const { data: usersData } = useQuery(GET_USERS);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCameraIconClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,7 +106,7 @@ const AddPostForm: React.FC = () => {
       setContent("");
       setMentions([]);
       setImageUrl("");
-      alert("Post added successfully!");
+      toast("Post added successfully!");
       window.location.reload();
     } catch (error) {
       console.error("Error adding post:", error);
@@ -121,27 +130,34 @@ const AddPostForm: React.FC = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mx-auto bg-white shadow-md rounded-lg p-6 w-[100%"
-    >
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Create a Post</h2>
-      
+      className=" bg-white shadow-md rounded-lg p-6"
+    >      
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className='flex gap-x-4 items-center'>
-        { profPic && <img src={`data:${profPic}`} style={{ width: "60px", height: "60px", borderRadius: "50%" }} />}
-        { !profPic && <img src={`https://cdn-icons-png.flaticon.com/512/149/149071.png`} style={{ width: "60px", height: "60px", borderRadius: "50%" }} />}
+        <div className='flex gap-x-4'>
+        <div className='flex gap-x-4 items-start'>
+        { profPic && <img src={`data:${profPic}`} style={{ width: "60px", height: "60px", borderRadius: "50%", border:'1px solid green' }} />}
+        { !profPic && <img src={`https://cdn-icons-png.flaticon.com/512/149/149071.png`} style={{ width: "60px", height: "60px", borderRadius: "50%", border:'4px solid blue' }} />}
         </div>
 
-        <div>
+        <div className='relative w-[100%]'>
           <textarea
             id="content"
             placeholder="What's on your mind?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
+            className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-16 resize-none"
             required
+            
           ></textarea>
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
+          <input ref={fileInputRef} className='hidden' type="file" accept="image/*" onChange={handleImageUpload} />
+          <div 
+        onClick={handleCameraIconClick} 
+        className="absolute bottom-4 right-6 cursor-pointer hover:opacity-70 transition-opacity"
+      >
+        <Camera size={24} className="text-gray-500" />
+      </div>
           {imageUrl && <img src={imageUrl} alt="Preview" width="200" />}
+        </div>
         </div>
 
         {/* <div>
@@ -177,7 +193,7 @@ const AddPostForm: React.FC = () => {
             Select users to mention in your post
           </p>
         </div> */}
-        <div>
+        <div className='flex justify-between w-[100%]'>
           <Autocomplete
             multiple
             id="user-mentions"
@@ -185,6 +201,7 @@ const AddPostForm: React.FC = () => {
             getOptionLabel={(option) => option.displayname}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={mentions}
+            className='w-[40%]'
             onChange={(_, newValue) => {
               setMentions(newValue);
             }}
@@ -206,19 +223,19 @@ const AddPostForm: React.FC = () => {
               />
             )}
           />
-          <p className="text-xs text-gray-500 mt-1">
+          {/* <p className="text-xs text-gray-500 mt-1">
             Select users to mention in your post
-          </p>
-        </div>
+          </p> */}
 
         <motion.button 
           type="submit"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full py-3 rounded-md text-white font-semibold bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
+          className="w-[40%] px-10 py-1 rounded-md text-white font-semibold bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
           Post
         </motion.button>
+          </div>
       </form>
     </motion.div>
   );

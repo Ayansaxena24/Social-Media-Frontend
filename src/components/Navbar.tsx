@@ -1,12 +1,13 @@
 // src/components/Navbar.tsx
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; // Assuming useUser is the hook from your UserContext
 import { auth } from "../auth/firebaseConfig"; // Make sure to import your Firebase auth
 import { gql, useQuery } from "@apollo/client";
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import insta from '../assets/insta.png';
 
 
 const GET_USERS = gql`
@@ -16,6 +17,7 @@ const GET_USERS = gql`
       email
       username
       profilePicture
+      bio
     }
   }
 `;
@@ -31,6 +33,7 @@ const Navbar: React.FC = () => {
     error: userError,
   } = useQuery(GET_USERS);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const location = useLocation();
 
 
   const handleDp = () => {
@@ -74,16 +77,79 @@ const Navbar: React.FC = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  if (location.pathname === '/signup') {
+    return (
+      <nav 
+        className="bg-white/50 backdrop-blur-xl"
+        style={{ 
+          padding: "10px", 
+          color: "black",
+          backgroundImage: `url('https://i.pinimg.com/1200x/42/43/e1/4243e170920d95f50c92ad35531e3248.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "top",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="flex justify-end items-center">
+          <Link to="/">
+            <img 
+              src={insta}
+              alt="Logo" 
+              className="h-10 w-auto"
+            />
+          </Link>
+        </div>
+      </nav>
+    )
+  }
+
 
   return (
-    <nav style={{ padding: "10px", backgroundColor: "#333", color: "#fff" }}>
+    <nav style={{ padding: "10px", color: "black" ,
+      backgroundImage: `url('https://i.pinimg.com/736x/a5/a3/27/a5a3271b71a1103bd2e02373e80b099b.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "top",
+        backgroundRepeat: "no-repeat",
+    }} className="bg-white/50 backdrop-blur-xl">
+      <div className="absolute left-0 right-0 bottom-0 h-[2px] overflow-hidden">
+            <div 
+                className="absolute w-1/2 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent 
+                           animate-laser opacity-70 blur-sm"
+            >
+                <div 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent 
+                               animate-laser-reflect opacity-50 mix-blend-screen"
+                ></div>
+            </div>
+        </div>
+        <style>{`
+            @keyframes laser {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(200%); }
+            }
+            
+            .animate-laser {
+                animation: laser 3s linear infinite;
+            }
+            
+            .animate-laser-reflect {
+                animation: laser 3s linear infinite;
+                animation-delay: 0.5s;
+            }
+        `}</style>
       <ul style={{ display: "flex", justifyContent: "space-between", listStyleType: "none", margin: 0, padding: 0 }}>
-        <li>
-          <Link to="/" style={{ color: "#fff", textDecoration: "none" }}>Home</Link>
-        </li>
-        <li>
-          <Link to="/newsfeed" style={{ color: "#fff", textDecoration: "none" }}>NewsFeed</Link>
-        </li>
+      <div className="flex justify-end items-center">
+          <Link to="/">
+            <img 
+              src={insta}
+              alt="Logo" 
+              className="h-10 w-auto"
+            />
+          </Link>
+          <p style={{ 
+                  fontFamily: "'Montserrat', sans-serif" 
+                }}>Quick Connect</p>
+        </div>
 
         <div>
       <Popover
@@ -97,6 +163,7 @@ const Navbar: React.FC = () => {
         }}
       >
         <Typography sx={{ p: 2 }}>
+        <li >Welcome, {user?.displayName}</li>
               <button onClick={handleLogout} style={{ padding: "5px 10px", backgroundColor: "red", color: "#fff", border: "none", cursor: "pointer" }}>
                 Logout
               </button>
@@ -108,7 +175,9 @@ const Navbar: React.FC = () => {
         {user ? (
           <>
             <div className="flex gap-x-4">
-            <li style={{ color: "#fff" }}>Welcome, {user.displayName}</li>
+            <li>
+          <Link to="/newsfeed" style={{ textDecoration: "none", color:'black' }}>NewsFeed</Link>
+        </li>
             <button onClick={handleClick}>
               { profPic && <img src={`data:${profPic}`} style={{ width: "30px", height: "30px", borderRadius: "50%" }} />}
               { !profPic && <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style={{ width: "30px", height: "30px", borderRadius: "50%" }} />}

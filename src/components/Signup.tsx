@@ -5,16 +5,28 @@ import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { gql, useMutation } from "@apollo/client";
-import { Eye, EyeOff, User, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, User, Lock, Mail, Camera } from "lucide-react";
+import { TextField } from "@mui/material";
 
 // GraphQL Mutation for user sign up
 const SIGN_UP_USER = gql`
-  mutation SignUpUser($username: String!, $email: String!, $profilePicture: String!) {
-    signUp(username: $username, email: $email, profilePicture: $profilePicture) {
+  mutation SignUpUser(
+    $username: String!
+    $email: String!
+    $profilePicture: String!
+    $bio: String!
+  ) {
+    signUp(
+      username: $username
+      email: $email
+      profilePicture: $profilePicture
+      bio: $bio
+    ) {
       id
       username
       email
       profilePicture
+      bio
     }
   }
 `;
@@ -24,6 +36,7 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +44,11 @@ const Signup: React.FC = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null); // State for profile picture
   const navigate = useNavigate();
   const [signUpUser] = useMutation(SIGN_UP_USER);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCameraIconClick = () => {
+    fileInputRef.current?.click();
+  };
 
   useEffect(() => {
     if (user) {
@@ -51,7 +69,11 @@ const Signup: React.FC = () => {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const firebaseUser = userCredential.user;
 
       // Update profile with display name
@@ -62,7 +84,8 @@ const Signup: React.FC = () => {
         variables: {
           username: displayName,
           email: email,
-          profilePicture: imageUrl, 
+          profilePicture: imageUrl,
+          bio: bio,
         },
       });
 
@@ -70,13 +93,13 @@ const Signup: React.FC = () => {
     } catch (err: any) {
       let errorMessage = "An error occurred during signup";
       switch (err.code) {
-        case 'auth/email-already-in-use':
+        case "auth/email-already-in-use":
           errorMessage = "Email is already registered";
           break;
-        case 'auth/invalid-email':
+        case "auth/invalid-email":
           errorMessage = "Invalid email address";
           break;
-        case 'auth/weak-password':
+        case "auth/weak-password":
           errorMessage = "Password is too weak";
           break;
         default:
@@ -91,29 +114,37 @@ const Signup: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return; // Ensure a file was selected
-    
+
     const reader = new FileReader();
-    
+
     reader.onloadend = () => {
       if (typeof reader.result === "string") {
         setImageUrl(reader.result); // Safely assign only if result is a string
-        } else {
-          console.error("FileReader result is not a string");
-          }
-          };
-          
-          console.log(imageUrl, "imageUrl")
-  
+      } else {
+        console.error("FileReader result is not a string");
+      }
+    };
+
+    console.log(imageUrl, "imageUrl");
+
     reader.readAsDataURL(file); // Start reading the file as Base64
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div 
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 overflow-hidden relative"
+      style={{
+        backgroundImage: `url('https://i.pinimg.com/1200x/42/43/e1/4243e170920d95f50c92ad35531e3248.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "top",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full max-w-md space-y-8 bg-white shadow-md rounded-xl p-8"
+        className="w-full max-w-md space-y-8 bg-white/30 backdrop-blur-xl shadow-md rounded-xl p-8"
       >
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -121,8 +152,8 @@ const Signup: React.FC = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <a 
-              href="/login" 
+            <a
+              href="/login"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               Sign in
@@ -130,22 +161,14 @@ const Signup: React.FC = () => {
           </p>
         </div>
 
-        <form 
-          className="mt-8 space-y-6" 
-          onSubmit={handleSignup}
-        >
+        <form className="mt-8 space-y-6" onSubmit={handleSignup}>
           <div className="rounded-md shadow-sm space-y-4">
             {/* Display Name Input */}
             <div className="relative">
-              <label htmlFor="displayName" className="sr-only">
-                Display Name
-              </label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
+              <TextField
                 id="displayName"
                 type="text"
+                label="Display Name"
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -157,14 +180,9 @@ const Signup: React.FC = () => {
 
             {/* Email Input */}
             <div className="relative">
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
+              <TextField
                 id="email"
+                label="Email Address"
                 type="email"
                 autoComplete="email"
                 required
@@ -176,16 +194,26 @@ const Signup: React.FC = () => {
               />
             </div>
 
+            <div>
+              <TextField
+                id="bio"
+                label="Bio"
+                type="bio"
+                autoComplete="bio"
+                required
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                disabled={isLoading}
+                className="appearance-none rounded-md relative block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Add a bio"
+              />
+            </div>
+
             {/* Password Input */}
             <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
+              <TextField
                 id="password"
+                label="Password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 required
@@ -208,8 +236,30 @@ const Signup: React.FC = () => {
                 )}
               </button>
             </div>
-            <input type="file" accept="image/*" onChange={handleImageUpload} />
-          {imageUrl && <img src={imageUrl} alt="Preview" width="200" />}
+            {!imageUrl &&
+            <div className="relative flex items-center">
+            <input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            <p className="opacity-0">jg</p>
+            <div
+              onClick={handleCameraIconClick}
+              className="cursor-pointer hover:opacity-70 transition-opacity"
+            >
+              <Camera size={24} className="text-gray-500" />
+            </div>
+            </div>
+            }
+            <div className="flex justify-center items-center relative">
+            {imageUrl &&
+            <><img src={imageUrl} alt="Preview" width="200" className="relative"/>
+            <button className="absolute -top-1 right-20 text-white" onClick={() => setImageUrl('')}>x</button>
+          </>}
+            </div>
           </div>
 
           {/* Error Message */}
@@ -231,8 +281,8 @@ const Signup: React.FC = () => {
               whileHover={{ scale: isLoading ? 1 : 1.05 }}
               whileTap={{ scale: isLoading ? 1 : 0.95 }}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                isLoading 
-                  ? "bg-gray-400 cursor-not-allowed" 
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
               }`}
             >
