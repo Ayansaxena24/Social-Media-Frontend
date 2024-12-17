@@ -68,9 +68,10 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length < 4) {
+    if (user && userData?.users?.length < 2) {
       console.log(userData?.users?.length, "userData?.users?.length");
-      navigate("/"); // Redirect to home if user is already logged in
+      alert("Already signed in. Please log out to create a new account.");
+      navigate("/newsfeed"); // Redirect to home if user is already logged in
     }
   }, [user]);
 

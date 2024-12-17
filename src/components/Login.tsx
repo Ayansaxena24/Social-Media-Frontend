@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { useUser } from "../context/UserContext";
+import { gql, useQuery } from "@apollo/client";
+import { ToastContainer, toast } from "react-toastify";
 // import { Eye, EyeOff } from "lucide-react";
+
+const GET_USERS = gql`
+  query GetUsers {
+    users {
+      id
+      email
+      username
+      profilePicture
+      bio
+    }
+  }
+`;
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
+  const { 
+    data: userData,
+    loading: userLoading,
+    error: userError, } = useQuery(GET_USERS);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -18,18 +38,27 @@ const Login: React.FC = () => {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/newsfeed");
+      toast.success("Logged in successfully!");
+      setTimeout(() => navigate("/newsfeed"), 800); // Redirect to newsfeed after a delay
     } catch (error: any) {
       const errorMessage = error.message.includes("invalid-credential")
         ? "Invalid email or password. Please try again."
         : error.message;
       
-      // Using a more modern toast/notification approach would be better in a real app
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user && userData?.users?.length < 6) {
+      console.log(userData?.users?.length, "userData?.users?.length");
+      alert("Already signed in. Please log out to log in with a new account.");
+      toast.success("Already signed in. Redirecting to newsfeed...");
+      setTimeout(() => navigate("/newsfeed"), 800);
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
@@ -40,6 +69,7 @@ const Login: React.FC = () => {
       backgroundRepeat: "no-repeat",
     }}
     >
+      <ToastContainer autoClose={700}/>
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

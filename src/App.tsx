@@ -6,6 +6,7 @@ import Signup from "./components/Signup";
 import NewsFeed from "./components/NewsFeed";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
+import ForgotPassword from "./components/ForgotPassword";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/newsfeed" element={<NewsFeed />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           {/* Protected Routes: Check if user is logged in */}
           <Route

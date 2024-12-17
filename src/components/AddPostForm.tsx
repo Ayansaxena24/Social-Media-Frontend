@@ -87,8 +87,11 @@ const AddPostForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(imageUrl, "asaasas")
-    console.log(profPic, "asaasas2")
+     // Check if either content or imageUrl is present
+  if (!content.trim() && !imageUrl) {
+    toast.error("Please add text or an image before posting");
+    return;
+  }
     try {
       await addPost({ 
         variables: { 
@@ -106,10 +109,11 @@ const AddPostForm: React.FC = () => {
       setMentions([]);
       setImageUrl("");
       toast("Post added successfully!");
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 800);
     } catch (error) {
       console.error("Error adding post:", error);
-      alert(error);
+      // alert(error);
+      toast.error("Failed to add post. Please try again.");
     }
   };
 
@@ -135,6 +139,7 @@ const AddPostForm: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       className=" bg-white shadow-md rounded-lg p-6"
     >      
+    <ToastContainer autoClose={700}/>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className='flex gap-x-4'>
         <div className='flex gap-x-4 items-start'>
@@ -149,8 +154,6 @@ const AddPostForm: React.FC = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-16 resize-none"
-            required
-            
           ></textarea>
           <input ref={fileInputRef} className='hidden' type="file" accept="image/*" onChange={handleImageUpload} />
           <div 
@@ -162,40 +165,7 @@ const AddPostForm: React.FC = () => {
           {imageUrl && <img src={imageUrl} alt="Preview" width="200" />}
         </div>
         </div>
-
-        {/* <div>
-          <Autocomplete
-            multiple
-            id="user-mentions"
-            options={availableUsers}
-            getOptionLabel={(option) => option.displayname}
-            value={mentions}
-            onChange={(_, newValue) => {
-              setMentions(newValue);
-            }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  // key={option.id}
-                  label={option.displayname}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                value={mentions}
-                label="Mention Users"
-                placeholder="Select users to mention"
-              />
-            )}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Select users to mention in your post
-          </p>
-        </div> */}
+        
         <div className='flex justify-between w-[100%]'>
           <Autocomplete
             multiple
@@ -211,7 +181,6 @@ const AddPostForm: React.FC = () => {
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
                 <Chip
-                  // key={option.id}
                   label={option.displayname}
                   {...getTagProps({ index })}
                 />
@@ -226,9 +195,6 @@ const AddPostForm: React.FC = () => {
               />
             )}
           />
-          {/* <p className="text-xs text-gray-500 mt-1">
-            Select users to mention in your post
-          </p> */}
 
         <motion.button 
           type="submit"

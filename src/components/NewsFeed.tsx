@@ -8,6 +8,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ThumbsUp, UserPlus, UserMinus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 // GraphQL Queries
 const GET_POSTS = gql`
@@ -84,19 +85,6 @@ const NewsFeed: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const navigate = useNavigate();
 
-  // const handleLike = async (postId: string) => {
-  //   try {
-  //     let dp = userData?.users.filter(
-  //       (item: any) => item.email === user?.email
-  //     );
-  //     // console.log(userData.users, "dp");
-  //     await likePost({ variables: { postId, userId: dp[0]?.id } });
-  //     refetch(); // Refetch posts to update the like count
-  //   } catch (error) {
-  //     // console.error("Error liking post:", error);
-  //   }
-  // };
-
 
   //func to like/dislike the posts
   const handleLike = async (postId: string) => {
@@ -125,59 +113,6 @@ const NewsFeed: React.FC = () => {
     handleDp();
   }, [data])
 
-  // console.log(data, "data");
-
-  // useEffect(() => {
-  //   const presentUserId = userData?.users.find(
-  //     (item: any) => item.email === user?.email
-  //   )?.id;
-  //   // console.log(presentUserId, "presentUserId");
-  //   //posts from all the users that the current user is following + posts from current user
-  //   const visiblePosts = data?.posts.filter(
-  //     (item: any) =>
-  //       userData?.users
-  //         .find((user: any) => user.id === presentUserId)
-  //         ?.following.includes(item.authorid) || item.authorid === presentUserId
-  //   );
-  //   // console.log(userData?.users, "visiblePosts");
-  //   // console.log(visiblePosts, "posts");
-  //   setAvailablePosts(visiblePosts);
-
-  //   const visibleUsers = userData?.users.filter(
-  //     (item: any) => item.id !== presentUserId
-  //   );
-  //   setDisplayUsers(visibleUsers);
-  //   refetch();
-  // }, [userData, data, user]);
-
-  console.log(data, "dataaaa")
-
-  // useEffect(() => {
-  //   const presentUserId = userData?.users.find(
-  //     (item: any) => item.email === user?.email
-  //   )?.id;
-
-  //   // Filter visible posts based on following and current user
-  //   const visiblePosts = data?.posts.filter(
-  //     (item: any) =>
-  //       userData?.users
-  //         .find((user: any) => user.id === presentUserId)
-  //         ?.following.includes(item.authorid) || item.authorid === presentUserId
-  //   );
-
-  //   setAvailablePosts(visiblePosts || []);
-
-  //   // Update displayed posts and hasMore status
-  //   const initialPosts = visiblePosts?.slice(0, POSTS_PER_LOAD) || [];
-  //   setDisplayedPosts(initialPosts);
-  //   setHasMore((visiblePosts?.length || 0) > POSTS_PER_LOAD);
-  //   const visibleUsers = userData?.users.filter(
-  //         (item: any) => item.id !== presentUserId
-  //       );
-  //       setDisplayUsers(visibleUsers);
-  //       refetch();
-  // }, [userData, data, user]);
-
   //set active posts (the posts which will be visible to individual users since posts are only visible if the user is following other users).
   useEffect(() => {
     const presentUserId = userData?.users.find(
@@ -202,11 +137,17 @@ const NewsFeed: React.FC = () => {
       setHasMore(visiblePosts.length > POSTS_PER_LOAD);
     }
   
+    // The logged in user should not be able to FOLLOW / MENTION themselves
     const visibleUsers = userData?.users.filter(
       (item: any) => item.id !== presentUserId
     );
     setDisplayUsers(visibleUsers);
   }, [userData, data, user, displayedPosts.length]);
+
+  useEffect(() => {
+    refetch();
+    console.log(data, "data");
+  }, [data])
 
 
   //func to follow a user
@@ -219,6 +160,7 @@ const NewsFeed: React.FC = () => {
 
       if (!followerId) {
         // console.error("Current user not found");
+        toast.error("Error following user");
         return;
       }
 
@@ -232,6 +174,7 @@ const NewsFeed: React.FC = () => {
       refetch(); // Refetch users to update the follow status
     } catch (error) {
       alert(error)
+      toast.error("Error following user");
     }
   };
 
@@ -272,26 +215,6 @@ const NewsFeed: React.FC = () => {
     }
   }, [data]);
 
-  // console.log(userData, "userData");
-
-  // const loadMorePosts = () => {
-  //   // Calculate the current number of displayed posts
-  //   const currentLength = displayedPosts.length;
-
-  //   // Determine the next batch of posts to display
-  //   const nextPosts = posts.slice(
-  //     currentLength,
-  //     currentLength + POSTS_PER_LOAD
-  //   );
-
-  //   // Update displayed posts
-  //   setDisplayedPosts((prevPosts) => [...prevPosts, ...nextPosts]);
-  //   // console.log(displayedPosts, "qwerty");
-
-  //   // Check if there are more posts to load
-  //   setHasMore(currentLength + POSTS_PER_LOAD < posts.length);
-  // };
-
 
   //func to load more posts, if the user scrolls dopwn
   const loadMorePosts = () => {
@@ -312,19 +235,83 @@ const NewsFeed: React.FC = () => {
     setHasMore(currentLength + POSTS_PER_LOAD < availablePosts.length);
   };
 
+  // Skeleton loading components
+  const PostSkeleton = () => (
+    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="flex items-center mb-4">
+        <Skeleton circle width={40} height={40} className="mr-4" />
+        <Skeleton width={150} height={20} />
+      </div>
+      <Skeleton count={3} className="mb-2" />
+      <Skeleton height={200} />
+      <div className="mt-4">
+        <Skeleton width={100} height={30} />
+      </div>
+    </div>
+  );
+
+  const ProfileSkeleton = () => (
+    <div className="bg-white shadow-md rounded-lg p-6 flex flex-col justify-start items-center h-full">
+      <Skeleton circle width={100} height={100} />
+      <Skeleton width={150} height={20} className="mt-4" />
+      <Skeleton width={200} height={15} className="mt-2" />
+      <div className="flex items-center mt-4 space-x-4 w-full justify-between">
+        <div className="flex flex-col items-center flex-1">
+          <Skeleton width={50} height={20} />
+          <Skeleton width={80} height={15} className="mt-2" />
+        </div>
+        <div className="flex flex-col items-center flex-1">
+          <Skeleton width={50} height={20} />
+          <Skeleton width={80} height={15} className="mt-2" />
+        </div>
+        <div className="flex flex-col items-center flex-1">
+          <Skeleton width={50} height={20} />
+          <Skeleton width={80} height={15} className="mt-2" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const FollowUserSkeleton = () => (
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <Skeleton width={150} height={25} className="mb-4" />
+      {[1, 2, 3, 4].map((_, index) => (
+        <div key={index} className="flex justify-between items-center py-2 border-b">
+          <Skeleton width={100} height={20} />
+          <Skeleton width={80} height={30} />
+        </div>
+      ))}
+    </div>
+  );
+
+  // Modify the rendering to include skeletons
   if (!user) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex justify-center items-center h-screen text-2xl text-gray-600"
-      >
-        Please log in first.
-      </motion.div>
+      <div className="px-4 py-8 w-[100%] bg-gray-200">
+        <div className="flex flex-col md:flex-row gap-8 w-[100%] min-h-screen bg-gray-100 relative">
+          {/* Left Section - Profile Skeleton */}
+          <div className="lg:w-[20%] md:sticky md:top-4 md:h-[95vh]">
+            <ProfileSkeleton />
+          </div>
+
+          {/* Center Section - Posts Skeleton */}
+          <div className="flex-1.2 w-full lg:w-[50%]">
+            <div className="bg-white shadow-md rounded-lg p-6 w-[100%]">
+              <Skeleton width={200} height={30} className="mb-4" />
+              {[1, 2, 3, 4].map((_, index) => (
+                <PostSkeleton key={index} />
+              ))}
+            </div>
+          </div>
+
+          {/* Right Section - Users Skeleton */}
+          <div className="hidden md:flex md:w-1/4 w-[100%]">
+            <FollowUserSkeleton />
+          </div>
+        </div>
+      </div>
     );
   }
-
-  if (loading) return <Skeleton count={50} />;
 
   if (error)
     return (
@@ -408,7 +395,7 @@ const NewsFeed: React.FC = () => {
       backgroundRepeat: "no-repeat",
     }}
     >
-
+      <ToastContainer />
       <div className="flex flex-col md:flex-row gap-8 w-[100%] min-h-screen bg-gray-100 relative">
         {/* Left Section - Profile Box */}
         <div className="lg:w-[20%] md:sticky md:top-4 md:h-[95vh]">

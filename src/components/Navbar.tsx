@@ -111,10 +111,10 @@ const Navbar: React.FC = () => {
     )
   }
 
-  if (location.pathname === '/signup' || location.pathname === '/login') {
+  if (location.pathname === '/signup' || location.pathname === '/login' || location.pathname === '/forgot-password') {
     return (
       <nav 
-        className="bg-white/50 backdrop-blur-xl"
+        className="bg-white/30 backdrop-blur-xl"
         style={{ 
           padding: "10px", 
           color: "black",
