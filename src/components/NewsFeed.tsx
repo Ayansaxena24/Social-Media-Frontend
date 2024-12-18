@@ -341,7 +341,7 @@ const NewsFeed: React.FC = () => {
     )?.id;
     // console.log(presentUserId, "presentUserId");
     return userData?.users
-      .find((item: U) => item.id === presentUserId)
+      .find((item: User) => item.id === presentUserId)
       ?.following.includes(userId);
   };
 
