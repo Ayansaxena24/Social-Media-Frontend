@@ -95,7 +95,10 @@ This is a social media app built using **React**, **TypeScript**, **GraphQL**, a
 
 ### Testing:
 - **Jest**: A JavaScript testing framework for unit and integration testing.  
-- **React Testing Library (RTL)**: A lightweight testing library to test React components with a focus on user interactions. 
+- **React Testing Library (RTL)**: A lightweight testing library to test React components with a focus on user interactions.
+
+### Backend:
+- **Apollo Services**: Apollo Client seamlessly stores and manages data through its state management and caching capabilities, eliminating the need for a traditional backend.
 
 ---
 
@@ -125,7 +128,7 @@ Ensure you have the following installed:
    Move into the project's root directory:
 
    ```bash
-    cd raftlabs-social-media-app
+    cd Social-Media-Frontend
    ```
 
 3. **Install Dependencies**
