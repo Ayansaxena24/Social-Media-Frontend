@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { gql, useQuery } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
+import { TextField } from "@mui/material";
 // import { Eye, EyeOff } from "lucide-react";
 
 const GET_USERS = gql`
@@ -52,13 +53,20 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length < 6) {
+    if (user && userData?.users?.length > 1 && userData.users.find((item) => item.email === user.email)) {
       console.log(userData?.users?.length, "userData?.users?.length");
       alert("Already signed in. Please log out to log in with a new account.");
       toast.success("Already signed in. Redirecting to newsfeed...");
       setTimeout(() => navigate("/newsfeed"), 800);
     }
-  }, [user]);
+    
+  }, []);
+
+  useEffect(() => {
+    // Reset email and password on component mount
+    setEmail('');
+    setPassword('');
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
@@ -100,10 +108,10 @@ const Login: React.FC = () => {
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
-              <input
+              <TextField
                 id="email"
                 type="email"
-                autoComplete="email"
+                label="Email"
                 required
                 data-testid='email123'
                 value={email}
@@ -117,10 +125,10 @@ const Login: React.FC = () => {
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
-              <input
+              <TextField
                 id="password"
                 type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
+                label="Password"
                 data-testid='password123'
                 required
                 value={password}
@@ -137,40 +145,11 @@ const Login: React.FC = () => {
                 data-testid="eye"
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                  // <p>EyeOff</p>
+                  <EyeOff className="h-5 w-5 text-gray-600" />
                 ) : (
-                  <Eye className="h-5 w-5" />
-                  // <p>EyeOn</p>
+                  <Eye className="h-5 w-5 text-gray-600" />
                 )}
               </button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                data-testid="checkbox"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label 
-                htmlFor="remember-me" 
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a 
-                href="/forgot-password" 
-                className="font-medium text-blue-600 hover:text-blue-500"
-                data-testid="forgotpassword"
-              >
-                Forgot your password?
-              </a>
             </div>
           </div>
 

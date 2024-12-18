@@ -68,7 +68,7 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length < 2) {
+    if (user && userData?.users?.length > 1 && userData.users.find((item) => item.email === user.email)) {
       console.log(userData?.users?.length, "userData?.users?.length");
       alert("Already signed in. Please log out to create a new account.");
       navigate("/newsfeed"); // Redirect to home if user is already logged in
@@ -107,6 +107,9 @@ const Signup: React.FC = () => {
           bio: bio,
         },
       });
+
+      // Set a flag in sessionStorage to trigger reload
+    sessionStorage.setItem('reloadAfterSignup', 'true');
 
       navigate("/newsfeed");
     } catch (err: any) {

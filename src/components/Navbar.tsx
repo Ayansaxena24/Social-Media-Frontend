@@ -191,12 +191,18 @@ const Navbar: React.FC = () => {
           horizontal: 'left',
         }}
       >
-        <Typography sx={{ p: 2 }}>
-        <p>Welcome, {user?.displayName}</p>
-              <button onClick={handleLogout} style={{ padding: "5px 10px", backgroundColor: "red", color: "#fff", border: "none", cursor: "pointer" }}>
+        <div className="flex flex-col justify-center items-center w-full">
+        { profPic && <img src={`data:${profPic}`} style={{ width: "80px", height: "80px", borderRadius: "50%" }} className="mt-2" />}
+
+{ !profPic && <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />}
+
+        <Typography sx={{ p: 2 }} style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', width:'100%'}}>
+        <p>Welcome, <span className="font-semibold mt-2">{user?.displayName}</span></p>
+              <button onClick={handleLogout} className="mt-2 border border-1px-black rounded-lg w-[100%] hover:bg-red-600 hover:text-white text-red-600 transition duration-300 ease-in-out" style={{ padding: "5px 10px", cursor: "pointer" }}>
                 Logout
               </button>
             </Typography>
+            </div>
       </Popover>
     </div>
 

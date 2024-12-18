@@ -103,9 +103,17 @@ const NewsFeed: React.FC = () => {
     }
   };
 
-  // useEffect(() => {
-  //   setDisplayedPosts(visibleslice(0, POSTS_PER_LOAD * pageNumber) || []);
-  // }, [data])
+  useEffect(() => {
+    const reloadFlag = sessionStorage.getItem('reloadAfterSignup');
+    
+    if (reloadFlag === 'true') {
+      // Remove the flag to prevent future reloads
+      sessionStorage.removeItem('reloadAfterSignup');
+      
+      // Reload the page
+      window.location.reload();
+    }
+  }, [])
 
   // updating user info as soon as data changes
   useEffect(() => {
@@ -233,6 +241,7 @@ const NewsFeed: React.FC = () => {
 
     // Check if there are more posts to load
     setHasMore(currentLength + POSTS_PER_LOAD < availablePosts.length);
+    console.log(currentLength, availablePosts.length,"Loading more posts...");
   };
 
   // Skeleton loading components
@@ -537,7 +546,7 @@ const NewsFeed: React.FC = () => {
                           )}
                         </div>
                           <p className="text-gray-800 ml-2">{post.content}</p>
-                        {post.image && <img src={post.image} alt="Post" className="rounded-lg" />}
+                        {post.image && <img src={post.image} alt="Post" className="rounded-lg max-w-[675px] max-h-[525px] object-cover object-top"/>}
 
                         <div className="flex justify-between flex-2">
                           <button
