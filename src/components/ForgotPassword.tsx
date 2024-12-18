@@ -33,7 +33,8 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setMessage(""); // Clear previous messages
-    if (userData?.users.find((user : User)=> user.email !== email)) {
+    if (userData?.users.find((user : User)=> user.email !== email).length === 0) {
+      console.log(userData?.users.find((user : User)=> user.email !== email), "email")
       alert("No user found with this email address.");
       setIsLoading(false);
       return;

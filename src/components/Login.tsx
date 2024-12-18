@@ -158,6 +158,16 @@ const Login: React.FC = () => {
             </div>
           </div>
 
+          <div className="text-sm">
+              <a 
+                href="/forgot-password" 
+                className="font-medium text-blue-600 hover:text-blue-500 flex justify-end"
+                data-testid="forgotpassword"
+              >
+                Forgot your password?
+              </a>
+            </div>
+
           <div>
             <motion.button
               type="submit"
