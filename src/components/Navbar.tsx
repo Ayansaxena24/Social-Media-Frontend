@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
 
 
   const handleDp = () => {
-    let dp = userData?.users.filter((item: any) => item.email === user?.email);
+    let dp = userData?.users.filter((item : any) => item.email === user?.email);
     if (dp) {
       setProfPic(dp[0]?.profilePicture);
       console.log(dp[0]?.profilePicture, "dp");

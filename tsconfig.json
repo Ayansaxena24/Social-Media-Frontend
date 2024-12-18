@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "module": "commonjs",  // Ensure compatibility with Jest
+    "module": "ES2020",  // Ensure compatibility with Jest
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler",
+    "strict": true,
   },
   "include": ["src/**/*", "jest.config.ts"],
   "types": ["jest"]  // Add Jest types to ensure that Jest globals like describe, test, expect are recognized

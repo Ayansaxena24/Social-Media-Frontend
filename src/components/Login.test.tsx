@@ -8,7 +8,7 @@ import { MemoryRouter, BrowserRouter as Router } from "react-router-dom";
 import { TextEncoder, TextDecoder } from "util";
 
 global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+// global.TextDecoder = TextDecoder;
 
 
 // Mock the Firebase Auth function

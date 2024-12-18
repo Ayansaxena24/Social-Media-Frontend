@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { User, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../auth/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
@@ -33,7 +33,7 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setMessage(""); // Clear previous messages
-    if (userData?.users.find(user => user.email !== email)) {
+    if (userData?.users.find((user : User)=> user.email !== email)) {
       alert("No user found with this email address.");
       setIsLoading(false);
       return;
@@ -42,7 +42,7 @@ const ForgotPassword: React.FC = () => {
       await sendPasswordResetEmail(auth, email);
       setMessage("Password reset email sent! Check your inbox.");
       setTimeout(() => navigate("/login"), 2000); // Redirect to login after a delay
-    } catch (error: any) {
+    } catch (error : any) {
       const errorMessage = error.message.includes("user-not-found")
         ? "No user found with this email address."
         : "Failed to send reset email. Please try again.";

@@ -7,6 +7,7 @@ import { useUser } from "../context/UserContext";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Eye, EyeOff, Camera } from "lucide-react";
 import { TextField } from "@mui/material";
+import { User } from "../type/Types";
 
 // GraphQL Mutation for user sign up
 const SIGN_UP_USER = gql`
@@ -68,7 +69,7 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length > 1 && userData.users.find((item) => item.email === user.email)) {
+    if (user && userData?.users?.length > 1 && userData.users.find((item : User) => item.email === user.email)) {
       console.log(userData?.users?.length, "userData?.users?.length");
       alert("Already signed in. Please log out to create a new account.");
       navigate("/newsfeed"); // Redirect to home if user is already logged in
@@ -112,7 +113,7 @@ const Signup: React.FC = () => {
     sessionStorage.setItem('reloadAfterSignup', 'true');
 
       navigate("/newsfeed");
-    } catch (err: any) {
+    } catch (err : any) {
       let errorMessage = "An error occurred during signup";
       switch (err.code) {
         case "auth/email-already-in-use":

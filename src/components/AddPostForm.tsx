@@ -6,6 +6,7 @@ import { useUser } from '../context/UserContext';
 import { Camera } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { User } from '../type/Types';
 
 // Existing AddPost mutation
 const ADD_POST = gql`
@@ -75,7 +76,7 @@ const AddPostForm: React.FC = () => {
   
   useEffect(() => {
     const handleDp = () => {
-      let dp = usersData?.users.filter((item: any) => item.email === user?.email);
+      let dp = usersData?.users.filter((item : User) => item.email === user?.email);
       if (dp) {
         setProfPic(dp[0]?.profilePicture);
         setAuthorID(dp[0]?.id);
@@ -122,7 +123,7 @@ const AddPostForm: React.FC = () => {
   useEffect(() => {
 
     const presentUserId = usersData?.users.find(
-      (item: any) => item.email === user?.email
+      (item : User) => item.email === user?.email
     )?.id;
 
     const availUsers = usersData?.users.filter(

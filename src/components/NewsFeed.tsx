@@ -9,6 +9,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { ThumbsUp, UserPlus, UserMinus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { Post, User } from "../type/Types";
 
 // GraphQL Queries
 const GET_POSTS = gql`
@@ -90,7 +91,7 @@ const NewsFeed: React.FC = () => {
   const handleLike = async (postId: string) => {
     try {
       let dp = userData?.users.filter(
-        (item: any) => item.email === user?.email
+        (item : User) => item.email === user?.email
       );
       
       // Perform the like mutation
@@ -124,14 +125,14 @@ const NewsFeed: React.FC = () => {
   //set active posts (the posts which will be visible to individual users since posts are only visible if the user is following other users).
   useEffect(() => {
     const presentUserId = userData?.users.find(
-      (item: any) => item.email === user?.email
+      (item : User) => item.email === user?.email
     )?.id;
   
     // Filter visible posts based on following and current user
     const visiblePosts = data?.posts.filter(
-      (item: any) =>
+      (item : Post) =>
         userData?.users
-          .find((user: any) => user.id === presentUserId)
+          .find((user : User) => user.id === presentUserId)
           ?.following.includes(item.authorid) || item.authorid === presentUserId
     ) || [];
   
@@ -147,7 +148,7 @@ const NewsFeed: React.FC = () => {
   
     // The logged in user should not be able to FOLLOW / MENTION themselves
     const visibleUsers = userData?.users.filter(
-      (item: any) => item.id !== presentUserId
+      (item : User) => item.id !== presentUserId
     );
     setDisplayUsers(visibleUsers);
   }, [userData, data, user, displayedPosts.length]);
@@ -162,7 +163,7 @@ const NewsFeed: React.FC = () => {
   const handleFollow = async (followeeId: string) => {
     try {
       const follower = userData?.users.filter(
-        (item: any) => item.email === user?.email
+        (item : User) => item.email === user?.email
       );
       const followerId = follower[0]?.id;
 
@@ -189,7 +190,7 @@ const NewsFeed: React.FC = () => {
   //set all the data after fetching from UserData to display on the UserDetails section
   const handleDp = () => {
     let dp = userData?.users.filter(
-      (item: any) => item.email === user?.email
+      (item : User) => item.email === user?.email
     );
     if (dp) {
       setProfPic(dp[0]?.profilePicture);
@@ -199,7 +200,7 @@ const NewsFeed: React.FC = () => {
       setNumberOfFollowers(dp[0]?.followers.length);
       setNumberOfFollowing(dp[0]?.following.length);
       setNumberOfPosts(
-        data?.posts.filter((item: any) => item.authorid === dp[0]?.id).length
+        data?.posts.filter((item : Post) => item.authorid === dp[0]?.id).length
       );
       setBio(dp[0]?.bio);
     }
@@ -336,11 +337,11 @@ const NewsFeed: React.FC = () => {
     // func to find whether a user is friend of another user or not
   const isFriend = (userId: string) => {
     const presentUserId = userData?.users.find(
-      (item: any) => item.email === user.email
+      (item : User) => item.email === user.email
     )?.id;
     // console.log(presentUserId, "presentUserId");
     return userData?.users
-      .find((item: any) => item.id === presentUserId)
+      .find((item: U) => item.id === presentUserId)
       ?.following.includes(userId);
   };
 
@@ -546,7 +547,7 @@ const NewsFeed: React.FC = () => {
                           )}
                         </div>
                           <p className="text-gray-800 ml-2">{post.content}</p>
-                        {post.image && <img src={post.image} alt="Post" className="rounded-lg max-w-[675px] max-h-[525px] object-cover object-top"/>}
+                        {post.image && <img src={post.image} alt="Post" className="rounded-lg max-w-[775px] max-h-[525px] object-cover object-top"/>}
 
                         <div className="flex justify-between flex-2">
                           <button
@@ -555,7 +556,7 @@ const NewsFeed: React.FC = () => {
                           >
                             {post?.likedby.includes(
                               userData?.users.find(
-                                (item: any) => item.email === user?.email
+                                (item : any) => item.email === user?.email
                               )?.id
                             )
                               ? (

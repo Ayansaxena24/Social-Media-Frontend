@@ -5,10 +5,10 @@ import { MemoryRouter, BrowserRouter as Router } from "react-router-dom";
 import { TextEncoder, TextDecoder } from "util";
 import { UserProvider } from "../context/UserContext";
 import { GET_USERS } from "../graphql/mutations";
-import { MockedProvider } from "@apollo/client/testing";
+// import { MockedProvider } from "@apollo/client/testing";
 
 global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+// global.TextDecoder = TextDecoder;
 
 // Existing mocks for Firebase and other dependencies...
 
@@ -29,13 +29,13 @@ describe("Signup Component", () => {
   // Updated test to include UserProvider
   test("should allow the user to type in email and password fields", async() => {
     render(
-      <MockedProvider mocks={mocks} addTypename={false}>
+      // <MockedProvider mocks={mocks} addTypename={false}>
         <UserProvider>
           <MemoryRouter>
             <Signup />
           </MemoryRouter>
         </UserProvider>
-      </MockedProvider>
+      // </MockedProvider>
     );
 
     // Use userEvent to simulate typing

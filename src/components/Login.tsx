@@ -8,6 +8,7 @@ import { useUser } from "../context/UserContext";
 import { gql, useQuery } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
 import { TextField } from "@mui/material";
+import { User } from "../type/Types";
 // import { Eye, EyeOff } from "lucide-react";
 
 const GET_USERS = gql`
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [clickedSignIn, setClickedSignIn] = useState(false);
   const { user } = useUser();
   const { 
     data: userData,
@@ -40,8 +42,9 @@ const Login: React.FC = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Logged in successfully!");
+      setClickedSignIn(true);
       setTimeout(() => navigate("/newsfeed"), 800); // Redirect to newsfeed after a delay
-    } catch (error: any) {
+    } catch (error : any) {
       const errorMessage = error.message.includes("invalid-credential")
         ? "Invalid email or password. Please try again."
         : error.message;
@@ -53,14 +56,14 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && userData?.users?.length > 1 && userData.users.find((item) => item.email === user.email)) {
+    if (!clickedSignIn && user && userData?.users?.length > 1 && userData.users.find((item : User) => item.email === user.email)) {
       console.log(userData?.users?.length, "userData?.users?.length");
       alert("Already signed in. Please log out to log in with a new account.");
       toast.success("Already signed in. Redirecting to newsfeed...");
       setTimeout(() => navigate("/newsfeed"), 800);
     }
     
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     // Reset email and password on component mount
@@ -111,6 +114,7 @@ const Login: React.FC = () => {
               <TextField
                 id="email"
                 type="email"
+                InputLabelProps={{ shrink: true }}
                 label="Email"
                 required
                 data-testid='email123'
@@ -129,6 +133,7 @@ const Login: React.FC = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 label="Password"
+                InputLabelProps={{ shrink: true }}
                 data-testid='password123'
                 required
                 value={password}
