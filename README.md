@@ -8,7 +8,7 @@ This is a social media app built using **React**, **TypeScript**, **GraphQL**, a
 
 ### 1. **User Login**
 - Users can **sign up** and **log in** securely.
-- Authentication is handled using **Firebase Auth**, **AWS Cognito**, or **Auth0**.
+- Authentication is handled using **Firebase Auth**.
 
 ### 2. **News Feed**
 - Displays posts from people the user follows.
